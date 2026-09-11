@@ -1,0 +1,63 @@
+{
+  "name": "ShonenX Official Preset Extensions Bundle",
+  "version": "1.0.0",
+  "description": "Standard 4-extension preset bundle providing primary and fallback content resolvers for Anime and Manga.",
+  "extensions": [
+    {
+      "id": "miruro-anime-en",
+      "name": "Miruro",
+      "role": "Primary Anime",
+      "type": "anime",
+      "lang": "en",
+      "version": "1.0.0",
+      "baseUrl": "https://miruro.to",
+      "iconUrl": "https://miruro.to/favicon.ico",
+      "sourceFile": "/extensions/miruro_anime.dart",
+      "constantBinding": "kPrimaryAnimeExtension",
+      "isNsfw": false,
+      "status": "Ready"
+    },
+    {
+      "id": "anikototv-anime-en",
+      "name": "AnikotoTV",
+      "role": "Fallback Anime",
+      "type": "anime",
+      "lang": "en",
+      "version": "1.0.0",
+      "baseUrl": "https://anikototv.to",
+      "iconUrl": "https://anikototv.to/favicon.ico",
+      "sourceFile": "/extensions/anikototv_anime.dart",
+      "constantBinding": "kFallbackAnimeExtension",
+      "isNsfw": false,
+      "status": "Ready"
+    },
+    {
+      "id": "allmanga-manga-en",
+      "name": "AllManga",
+      "role": "Primary Manga",
+      "type": "manga",
+      "lang": "en",
+      "version": "1.0.0",
+      "baseUrl": "https://allmanga.to",
+      "iconUrl": "https://allmanga.to/favicon.ico",
+      "sourceFile": "/extensions/allmanga_manga.dart",
+      "constantBinding": "kPrimaryMangaExtension",
+      "isNsfw": false,
+      "status": "Ready"
+    },
+    {
+      "id": "comix-manga-en",
+      "name": "Comix",
+      "role": "Fallback Manga",
+      "type": "manga",
+      "lang": "en",
+      "version": "1.0.0",
+      "baseUrl": "https://comix.to",
+      "iconUrl": "https://comix.to/favicon.ico",
+      "sourceFile": "/extensions/comix_manga.dart",
+      "constantBinding": "kFallbackMangaExtension",
+      "isNsfw": false,
+      "status": "Ready"
+    }
+  ]
+}
