@@ -1,0 +1,115 @@
+name: Extensions CI
+
+# Builds and lints the Kotlin extension modules on every push/PR, and sigma boi
+# assembles release APKs when a version tag is pushed. 
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+env:
+  JAVA_VERSION: "17"
+
+jobs:
+
+  build-check:
+    name: Build & lint extensions
+    runs-on: ubuntu-latest
+    if: github.ref_type != 'tag'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Lint all extensions
+        run: ./gradlew ktlintCheck
+        continue-on-error: true # flip off once modules are lint-clean
+
+      - name: Assemble debug APKs — Anikoto
+        run: ./gradlew :src:eu:kanade:tachiyomi:animeextension:en:anikoto:assembleDebug
+
+      - name: Assemble debug APKs — AnimePahe
+        run: ./gradlew :src:eu:kanade:tachiyomi:animeextension:en:animepahe:assembleDebug
+
+      - name: Assemble debug APKs — AllManga
+        run: ./gradlew :src:eu:kanade:tachiyomi:extension:en:allanime:assembleDebug
+
+      - name: Assemble debug APKs — Comix
+        run: ./gradlew :src:eu:kanade:tachiyomi:extension:en:comix:assembleDebug
+
+      - name: Upload debug APKs
+        uses: actions/upload-artifact@v4
+        with:
+          name: extensions-debug-apks
+          path: "**/build/outputs/apk/debug/*.apk"
+          retention-days: 7
+          if-no-files-found: warn
+
+  release-build:
+    name: Build & publish extension release
+    runs-on: ubuntu-latest
+    if: github.ref_type == 'tag'
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Assemble release APKs — Anikoto
+        run: ./gradlew :src:eu:kanade:tachiyomi:animeextension:en:anikoto:assembleRelease
+
+      - name: Assemble release APKs — AnimePahe
+        run: ./gradlew :src:eu:kanade:tachiyomi:animeextension:en:animepahe:assembleRelease
+
+      - name: Assemble release APKs — AllManga
+        run: ./gradlew :src:eu:kanade:tachiyomi:extension:en:allanime:assembleRelease
+
+      - name: Assemble release APKs — Comix
+        run: ./gradlew :src:eu:kanade:tachiyomi:extension:en:comix:assembleRelease
+
+      - name: Collect release APKs
+        run: |
+          mkdir -p release-out
+          find . -path "*/build/outputs/apk/release/*.apk" -exec cp {} release-out/ \;
+          ls -la release-out/
+
+      - name: Upload release APKs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: extensions-release-apks
+          path: release-out/*.apk
+          retention-days: 30
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-out/*.apk
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
