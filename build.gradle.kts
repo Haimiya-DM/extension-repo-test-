@@ -1,1 +1,4 @@
-// Placeholder root build.gradle.kts — replace with your existing root build file.
+plugins {
+    // Root build script plugins (applied per-module as needed; see
+    // gradle/build-logic for the kei.plugins.extension family)
+}
